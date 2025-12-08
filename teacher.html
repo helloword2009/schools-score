@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>หน้าสำหรับครู</title>
+  <link rel="stylesheet" href="styles/teacher.css">
+  <!-- ✅ โหลด auth.js ก่อน เพื่อให้มี facultyClassroom ใช้งาน -->
+  <script src="scripts/auth.js"></script>
+</head>
+<body>
+  <header>
+    <h1>ระบบจัดการคะแนน โรงเรียนสตรีนครสวรรค์</h1>
+  </header>
+
+  <main>
+    <form onsubmit="addScore(event)" class="form-card">
+      <!-- ✅ แสดงคณะสีจาก login -->
+      <div class="form-group">
+        <label>คณะสี:</label>
+        <span id="facultyName" class="faculty-label"></span>
+      </div>
+      
+      <div class="form-group">
+        <label for="classroom">ห้องเรียน:</label>
+        <!-- ✅ เปลี่ยนเป็น select -->
+        <select id="classroom" class="form-control" required></select>
+      </div>
+
+      <div class="form-group">
+        <label for="scoreType">ประเภทคะแนน:</label>
+        <select id="scoreType" class="form-control" required>
+          <option value="คะแนนมาสาย">คะแนนคนมาสาย</option>
+          <option value="คะแนนความสะอาด">คะแนนความสะอาด</option>
+          <option value="คะแนนการเข้าแถว">คะแนนการเข้าแถว</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="scoreValue">คะแนน:</label>
+        <input type="number" id="scoreValue" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <label for="activityImage">แนบรูปกิจกรรม:</label>
+        <input type="file" id="activityImage" class="form-control" accept="image/*">
+      </div>
+
+      <button type="submit" class="submit-btn">บันทึกคะแนน</button>
+    </form>
+
+    <p id="msg"></p>
+
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>เวลา</th>
+          <th>คณะสี</th>
+          <th>ห้องเรียน</th>
+          <th>ประเภทคะแนน</th>
+          <th>คะแนน</th>
+          <th>รูปกิจกรรม</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button class="reset-btn" onclick="resetHistory()">รีเซ็ตประวัติทั้งหมด</button>
+  </main>
+
+  <!-- popup รูป -->
+  <div id="imagePopup" onclick="closePopup()">
+    <img id="popupImage" src="">
+  </div>
+
+  <script>
+    // ✅ ดึงคณะจาก localStorage
+    const faculty = localStorage.getItem("currentFaculty");
+    document.getElementById("facultyName").innerText = faculty || "ไม่พบข้อมูลคณะ";
+
+    // ✅ เติม dropdown ห้องเรียนจาก facultyClassroom ที่อยู่ใน auth.js
+    const classroomSelect = document.getElementById("classroom");
+    classroomSelect.innerHTML = "";
+    if (facultyClassroom[faculty]) {
+      facultyClassroom[faculty].forEach(room => {
+        const opt = document.createElement("option");
+        opt.value = room;
+        opt.textContent = room;
+        classroomSelect.appendChild(opt);
+      });
+    }
+
+    function addScore(event) {
+      event.preventDefault();
+
+      const classroom = document.getElementById("classroom").value;
+      const type = document.getElementById("scoreType").value;
+      const value = parseInt(document.getElementById("scoreValue").value);
+      const time = new Date().toLocaleString("th-TH");
+
+      const fileInput = document.getElementById("activityImage");
+      let imageData = "";
+
+      if (fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imageData = e.target.result;
+          saveHistory(faculty, classroom, type, value, time, imageData);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        saveHistory(faculty, classroom, type, value, time, imageData);
+      }
+    }
+
+    function saveHistory(faculty, classroom, type, value, time, imageData) {
+      let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+      history.push({ faculty, classroom, type, value, time, image: imageData });
+      localStorage.setItem("scoreHistory", JSON.stringify(history));
+
+      renderHistory();
+      document.getElementById("scoreValue").value = "";
+      document.getElementById("activityImage").value = "";
+      document.getElementById("msg").innerText = "บันทึกคะแนนเรียบร้อยแล้ว ✅";
+      setTimeout(() => { document.getElementById("msg").innerText = ""; }, 3000);
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+      const tbody = document.getElementById("historyTable").querySelector("tbody");
+      tbody.innerHTML = "";
+
+      history.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.time}</td>
+          <td>${item.faculty}</td>
+          <td>${item.classroom}</td>
+          <td>${item.type}</td>
+          <td>${item.value > 0 ? "+" + item.value : item.value}</td>
+          <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function resetHistory() {
+      if (confirm("คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติทั้งหมด?")) {
+        localStorage.removeItem("scoreHistory");
+        renderHistory();
+      }
+    }
+
+    function openImagePopup(src) {
+      document.getElementById("popupImage").src = src;
+      document.getElementById("imagePopup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("imagePopup").style.display = "none";
+    }
+
+    renderHistory();
+  </script>
+
+  <footer>
+    <p>© โรงเรียนสตรีนครสวรรค์ | <a href="select-faculty.html">ดูคะแนนคณะสี</a></p>
+  </footer>
+</body>
+</html>

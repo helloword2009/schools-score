@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Tahoma", sans-serif;
+
+  /* ✅ ใช้หลาย background พร้อมกัน */
+  background-image: 
+    /*linear-gradient(145deg, rgba(96, 169, 243, 0.6), rgba(0, 85, 170, 0.6)),*/
+    url("../images/DSC_0694.jpg");
+
+  background-size: cover;            /* ✅ ขยายภาพให้เต็มจอ */
+  background-position: center;       /* ✅ จัดตำแหน่งภาพให้อยู่ตรงกลาง */
+  background-repeat: no-repeat;      /* ✅ ไม่ให้ภาพซ้ำ */
+  background-attachment: fixed;      /* ✅ ให้ภาพนิ่งเวลาเลื่อนหน้า */
+
+  text-align: center;
+}
+/* เพิ่มเลเยอร์สีขาวทับภาพพื้นหลังเพื่อให้ข้อความอ่านง่ายขึ้น */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.4); /* ปรับค่า 0.4 ให้จางมากหรือน้อย */
+  z-index: -1; /* อยู่หลังข้อความ */
+}
+
+h1 {
+  color: #014a93;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+
+/* Header */
+header {
+  padding: 40px 20px;
+}
+
+.school-logo {
+  width: 120px;
+  margin-bottom: 15px;
+  mix-blend-mode: multiply;
+}
+
+header h1 {
+  font-size: 28px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Main */
+main {
+  margin-top: 40px;
+}
+
+.login-btn {
+  display: inline-block;
+  background-color: #FFD700;
+  color: #003366;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: 0.3s;
+  border: 2px solid #003366;
+}
+
+.login-btn:hover {
+  background-color: #003366;
+  color: #FFD700;
+}
+
+.news-banner {
+  background-color: #fff;
+  color: #003366;
+  padding: 10px 20px;
+  margin: 20px auto;
+  border-radius: 8px;
+  max-width: 600px;
+  font-size: 18px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+

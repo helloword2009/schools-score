@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>เลือกคณะสี</title>
+  <link rel="stylesheet" href="styles/select-faculty.css">
+</head>
+<body>
+  <div class="container">
+    <img src="http://www.sns.ac.th/picture/logo.JPG" alt="ตราโรงเรียน" class="school-logo">
+    <h1>เลือกคณะสีที่ต้องการดูคะแนน</h1>
+
+    <div class="faculty-buttons">
+      <button class="faculty-button" onclick="goToScore('มาลัยพิรุณ')">มาลัยพิรุณ</button>
+      <button class="faculty-button" onclick="goToScore('ไพรจิตเวหาส')">ไพรจิตเวหาส</button>
+      <button class="faculty-button" onclick="goToScore('โอภาสรวี')">โอภาสรวี</button>
+      <button class="faculty-button" onclick="goToScore('จันทราอำไพร')">จันทราอำไพร</button>
+      <button class="faculty-button" onclick="goToScore('รัศมีดารา')">รัศมีดารา</button>
+    </div>
+  </div>
+
+  <script>
+    function goToScore(facultyName) {
+      window.location = `faculty-score.html?faculty=${encodeURIComponent(facultyName)}`;
+    }
+  </script>
+</body>
+</html>

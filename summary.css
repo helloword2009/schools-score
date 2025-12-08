@@ -1,0 +1,82 @@
+body {
+  font-family: "Tahoma", sans-serif;
+  margin: 0;
+  padding: 0;
+  /* ✅ ใช้หลาย background พร้อมกัน */
+  background: url("../images/DSC_0694.jpg") center/cover no-repeat fixed;
+  text-align: center;
+  color: #FFD700;
+  text-align: center;
+}
+
+header {
+  padding: 20px;
+  color: #003366;
+}
+
+main {
+  padding: 30px;
+}
+
+.winner-box {
+  background: #FFD700;
+  color: #003366;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+table {
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  border-collapse: collapse;
+  background: #ffffff;
+  color: #003366;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #ccc;
+}
+
+th {
+  background-color: #003366;
+  color: #FFD700;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+footer {
+  margin-top: 40px;
+  padding: 15px;
+  background-color: #003366;
+  color: #FFD700;
+  border-radius: 12px;
+  padding: 20px;
+}
+a {
+    color: #FFD700; /* ลิงก์เหลือง */
+    text-decoration: none;
+}
+button.print-btn {
+  margin: 20px 0;
+  padding: 10px 20px;
+  background: #003366;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button.print-btn:hover {
+  background: #FFD700;
+  color: #003366;
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>รายงานคะแนนคณะสี</title>
+  <!-- เรียกใช้ CSS สำหรับรายงาน -->
+  <link rel="stylesheet" href="styles/report.css">
+  <style>
+    @media print {
+      .print-btn {
+        display: none; /* ซ่อนปุ่มตอนพิมพ์ */
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>รายงานคะแนนคณะสี โรงเรียนสตรีนครสวรรค์</h1>
+    <p>วันที่พิมพ์: <span id="printDate"></span></p>
+  </header>
+
+  <!-- ✅ ปุ่มพิมพ์รายงาน -->
+  <button class="print-btn" onclick="window.print()">พิมพ์รายงาน</button>
+
+  <div id="reportContainer"></div>
+
+  <script>
+    // ใส่วันที่พิมพ์
+    document.getElementById("printDate").innerText = new Date().toLocaleDateString("th-TH");
+
+    const history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+    const types = ["คะแนนมาสาย", "คะแนนการเข้าแถว", "คะแนนความสะอาด"];
+    const container = document.getElementById("reportContainer");
+
+    types.forEach(type => {
+  const filtered = history.filter(item => item.type === type);
+  let total = filtered.reduce((sum, item) => sum + item.value, 0);
+
+  const section = document.createElement("section");
+  section.innerHTML = `
+    <h2>${type} (รวม ${total} คะแนน)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>เวลา</th>
+          <th>คณะสี</th>
+          <th>ห้องเรียน</th>
+          <th>คะแนน</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.map(item => `
+          <tr class="faculty-${item.faculty}">
+            <td>${item.time}</td>
+            <td>${item.faculty}</td>
+            <td>${item.classroom}</td>
+            <td>${item.value}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+  container.appendChild(section);
+});
+
+
+    const grandTotal = history.reduce((sum, item) => sum + item.value, 0);
+    const summary = document.createElement("h2");
+    summary.innerText = "คะแนนรวมทั้งหมด: " + grandTotal + " คะแนน";
+    container.appendChild(summary);
+  </script>
+</body>
+</html>

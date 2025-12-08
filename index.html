@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คะแนนคณะสีโรงเรียนสตรีนครสวรรค์</title>
+  <link rel="stylesheet" href="styles/index.css">
+  <script defer src="scripts/database.js"></script>
+</head>
+
+<body>
+  <header>
+    <img src="http://www.sns.ac.th/picture/logo.JPG" alt="ตราโรงเรียนสตรีนครสวรรค์" class="school-logo">
+    <h1>ระบบคะแนนคณะสีโรงเรียนสตรีนครสวรรค์</h1>
+  </header>
+
+  <!-- ✅ แบนเนอร์ข่าวสาร -->
+  <section class="news-banner">
+    <marquee behavior="scroll" direction="left">
+      🔔 คณะรัศมีได้คะแนนกิจกรรมหน้าเสาธงเพิ่ม 10 คะแนน | คณะจันทราเตรียมกิจกรรมวันพรุ่งนี้ |
+      คณะมาลัยชนะการแข่งขันตอบปัญหา
+    </marquee>
+  </section>
+
+  <main>
+    <a href="role.html" class="login-btn">เข้าสู่ระบบ</a>
+  </main>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("faculty")?.addEventListener("change", renderScores);
+      renderScores();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+body {
+  font-family: "Tahoma", sans-serif;
+  margin: 0;
+  padding: 0;
+  
+  /* ✅ ใช้หลาย background พร้อมกัน */
+  background-image: 
+    /*linear-gradient(145deg, rgba(0, 51, 102, 0.6), rgba(0, 85, 170, 0.6)),*/
+    url("../images/DSC_0694.jpg");
+  background-size: cover;            /* ✅ ขยายภาพให้เต็มจอ */
+  background-position: center;       /* ✅ จัดตำแหน่งภาพให้อยู่ตรงกลาง */
+  background-repeat: no-repeat;      /* ✅ ไม่ให้ภาพซ้ำ */
+  background-attachment: fixed;      /* ✅ ให้ภาพนิ่งเวลาเลื่อนหน้า */
+  text-align: center;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* กล่องหลัก */
+.container {
+  background-color: #ffffff;
+  border: 3px solid #FFD700; /* ขอบเหลือง */
+  border-radius: 12px;
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+/* โลโก้โรงเรียน */
+.school-logo {
+  width: 100px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+/* หัวข้อ */
+h1 {
+  font-size: 22px;
+  color: #003366; /* น้ำเงิน */
+  margin-bottom: 25px;
+}
+
+/* ปุ่มเลือกคณะ */
+.faculty-buttons {
+  display: flex;
+  flex-direction: column; /* เรียงแนวตั้ง */
+  gap: 15px;
+}
+
+.faculty-button {
+  width: 100%;
+  padding: 15px;
+  background: #FFD700; /* เหลือง */
+  color: #003366;       /* น้ำเงิน */
+  border: none;
+  border-radius: 50px; /* ทำให้เป็นทรงกระบอก */
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s, color 0.3s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.faculty-button:hover {
+  transform: scale(1.05);
+  background: #003366; /* น้ำเงิน */
+  color: #FFD700;      /* เหลือง */
+}

@@ -1,0 +1,211 @@
+body {
+  font-family: "Tahoma", sans-serif;
+  margin: 0;
+  padding: 0;
+
+  /* ✅ ใช้หลาย background พร้อมกัน */
+  background: url("../images/DSC_0694.jpg") center/cover no-repeat fixed;
+
+  text-align: center;
+  color: #003366;
+
+  /* ✅ ให้ ::before อ้างอิงได้ */
+  position: relative;
+  min-height: 100vh;
+}
+/* เพิ่มเลเยอร์สีขาวทับภาพพื้นหลังเพื่อให้ข้อความอ่านง่ายขึ้น */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.4); /* ปรับค่า 0.4 ให้จางมากหรือน้อย */
+  z-index: -1; /* อยู่หลังข้อความ */
+}
+
+
+
+header {
+  background-color: #003366;
+  color: #FFD700;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+h1 {
+  margin: 0;
+  font-size: 26px;
+}
+h2 {
+  font-size: 22px;
+  margin: 20px 0;
+  text-align: center;
+  color: #003366;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  
+}
+
+/* ตารางคะแนน */
+table {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px auto;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: #fff;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #003366;
+  color: #FFD700;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #fffacd;
+}
+
+/* รูปกิจกรรม */
+img.activity-img {
+  max-width: 80px;
+  border-radius: 6px;
+  border: 2px solid #FFD700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+img.activity-img:hover {
+  transform: scale(1.05);
+}
+
+/* กล่องสรุปคะแนน */
+.summary {
+  max-width: 900px;
+  margin: 30px auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+  color: #003366;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.summary-card h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #003366;
+}
+
+.summary-card p {
+  font-size: 20px;
+  margin: 0;
+  color: #0055aa;
+}
+
+/* ปุ่มกลับ */
+.back-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 25px;
+  background-color: #FFD700;
+  color: #003366;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.3s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.back-btn:hover {
+  background-color: #003366;
+  color: #FFD700;
+}
+
+/* Footer */
+footer {
+  margin-top: 40px;
+  padding: 15px;
+  background-color: #003366;
+  color: #FFD700;
+  text-align: center;
+}
+
+/* กล่องสรุปคะแนน */
+.summary {
+  max-width: 900px;
+  margin: 40px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center; /* ✅ จัดทุก card ให้อยู่ตรงกลาง */
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+  color: #003366;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  min-width: 220px;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+}
+
+.summary-card h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #003366;
+}
+
+.summary-card p {
+  font-size: 22px;
+  margin: 0;
+  color: #FFD700;
+}
+
+/* ✅ Card พิเศษสำหรับคะแนนรวม */
+.summary-card.total {
+  background: #003366;
+  color: #FFD700;
+  border: 3px solid #FFD700;
+  flex-basis: 100%;       /* ให้กินเต็มแถว */
+  max-width: 400px;       /* แต่จำกัดความกว้าง */
+  margin: 0 auto;         /* จัดให้อยู่ตรงกลาง */
+}
+
+.summary-card.total h3 {
+  color: #FFD700;
+}
+
+.summary-card.total p {
+  color: #ffffff;
+  font-size: 26px;
+}

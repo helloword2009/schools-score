@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>เข้าสู่ระบบ</title>
+  <link rel="stylesheet" href="styles/login.css">
+  <script defer src="scripts/auth.js"></script>
+</head>
+<body class="login-page">
+  <div class="login-overlay">
+    <div class="login-box">
+      <img src="http://www.sns.ac.th/picture/logo.JPG" alt="โลโก้โรงเรียน" class="school-logo">
+      <h1>โรงเรียนสตรีนครสวรรค์</h1>
+      <p>ระบบบันทึกคะแนนคณะสี</p>
+
+      <input id="email" placeholder="อีเมลคณะ" type="email" required>
+      <input id="password" placeholder="รหัสผ่าน" type="password" required>
+      <!-- ✅ กำหนด type="button" เพื่อไม่ให้ form ส่งเอง -->
+      <button type="button" onclick="login()">เข้าสู่ระบบ</button>
+      <p id="msg"></p>
+    </div>
+  </div>
+</body>
+</html>

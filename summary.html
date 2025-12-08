@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>สรุปผลคณะยอดเยี่ยมประจำสัปดาห์</title>
+  <link rel="stylesheet" href="styles/summary.css">
+</head>
+<body>
+  <header>
+    <h1>สรุปผลคณะยอดเยี่ยมประจำสัปดาห์</h1>
+  </header>
+
+  <main>
+    <div id="winnerBox" class="winner-box"></div>
+
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>คณะสี</th>
+          <th>คะแนนรวม</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+
+  <footer>
+    <p>© โรงเรียนสตรีนครสวรรค์ |<a href="report.html"> พิมพ์รายงาน</a></p>
+  </footer>
+
+  <script>
+    function calculateSummary() {
+      const history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+
+      // ✅ รายชื่อคณะทั้ง 5
+      const faculties = [
+        "มาลัยพิรุณ",
+        "ไพรจิตเวหาส",
+        "โอภาสรวี",
+        "จันทราอำไพร",
+        "รัศมีดารา"
+      ];
+
+      // รวมคะแนนตามคณะ
+      const totals = {};
+      faculties.forEach(f => totals[f] = 0);
+
+      history.forEach(item => {
+        if (totals[item.faculty] !== undefined) {
+          totals[item.faculty] += item.value;
+        }
+      });
+
+      // หาคณะคะแนนสูงสุด
+      let winner = null;
+      let maxScore = -Infinity;
+      faculties.forEach(f => {
+        if (totals[f] > maxScore) {
+          maxScore = totals[f];
+          winner = f;
+        }
+      });
+
+      // แสดงผลผู้ชนะ
+      const winnerBox = document.getElementById("winnerBox");
+      if (winner) {
+        winnerBox.innerHTML = `🏆 <strong>${winner}</strong> ได้เป็นคณะยอดเยี่ยมประจำสัปดาห์ ด้วยคะแนนรวม ${maxScore} คะแนน`;
+      } else {
+        winnerBox.innerHTML = "ยังไม่มีข้อมูลคะแนนในสัปดาห์นี้";
+      }
+
+      // เติมตารางสรุปครบ 5 คณะ
+      const tbody = document.getElementById("summaryTable").querySelector("tbody");
+      tbody.innerHTML = "";
+      faculties.forEach(f => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${f}</td>
+          <td>${totals[f]}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    calculateSummary();
+  </script>
+</body>
+</html>
