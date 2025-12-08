@@ -4,7 +4,7 @@ body {
   padding: 0;
 
   /* ✅ ใช้หลาย background พร้อมกัน */
-  background: url("../images/DSC_0694.jpg") center/cover no-repeat fixed;
+  background: url('DSC_0694.jpg'); center/cover no-repeat fixed;
 
   text-align: center;
   color: #003366;
@@ -209,3 +209,4 @@ footer {
   color: #ffffff;
   font-size: 26px;
 }
+
