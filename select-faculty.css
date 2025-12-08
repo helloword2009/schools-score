@@ -6,7 +6,7 @@ body {
   /* ✅ ใช้หลาย background พร้อมกัน */
   background-image: 
     /*linear-gradient(145deg, rgba(0, 51, 102, 0.6), rgba(0, 85, 170, 0.6)),*/
-    url("../images/DSC_0694.jpg");
+    url('DSC_0694.jpg');
   background-size: cover;            /* ✅ ขยายภาพให้เต็มจอ */
   background-position: center;       /* ✅ จัดตำแหน่งภาพให้อยู่ตรงกลาง */
   background-repeat: no-repeat;      /* ✅ ไม่ให้ภาพซ้ำ */
@@ -71,3 +71,4 @@ h1 {
   background: #003366; /* น้ำเงิน */
   color: #FFD700;      /* เหลือง */
 }
+
