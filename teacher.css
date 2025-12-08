@@ -1,6 +1,6 @@
 body {
   font-family: "Tahoma", sans-serif;
-  background: url("../images/DSC_0694.jpg") center/cover no-repeat fixed;
+  background: url('DSC_0694.jpg'); center/cover no-repeat fixed;
   margin: 0;
   padding: 0;
 }
@@ -171,3 +171,4 @@ a {
   color: #FFD700; /* ลิงก์เหลือง */
   text-decoration: none;
 }
+
