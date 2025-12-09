@@ -4,7 +4,7 @@ body {
   padding: 0;
 
   /* พื้นหลัง */
-  background-image: url('DSC_0694.jpg');
+  background-image: url("../images/DSC_0694.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -13,9 +13,9 @@ body {
   text-align: center;
   display: flex;
   justify-content: center;
-  align-items: center;   /* ✅ กลับมาให้อยู่กลางแนวตั้ง */
+  align-items: center;   /* อยู่กลางแนวตั้ง */
   min-height: 100vh;
-  padding: 20px;         /* ✅ padding รอบ ๆ */
+  padding: 20px;
 }
 
 /* กล่องหลัก */
@@ -23,24 +23,25 @@ body {
   background-color: #ffffff;
   border: 5px solid #FFD700;
   border-radius: 24px;
-  padding: 60px 36px;        /* ✅ padding ใหญ่พอดี */
+  padding: 60px 36px;
   width: 100%;
-  max-width: 680px;          /* ✅ กว้างขึ้น */
+  max-width: 400px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   text-align: center;
-  margin-top: -40px;         /* ✅ ดันขึ้นเล็กน้อย แต่ยังอยู่กลาง */
+  margin-top: -1px;
+  height: 580px;
 }
 
 /* โลโก้โรงเรียน */
 .school-logo {
-  width: 220px;              /* ✅ โลโก้ใหญ่พอดี */
+  width: 220px;
   height: auto;
   margin-bottom: 32px;
 }
 
 /* หัวข้อ */
 h1 {
-  font-size: 38px;           /* ✅ ตัวอักษรใหญ่พอดี */
+  font-size: 38px;
   color: #003366;
   margin-bottom: 50px;
   line-height: 1.6;
@@ -50,17 +51,17 @@ h1 {
 .faculty-buttons {
   display: flex;
   flex-direction: column;
-  gap: 36px;                 /* ✅ ช่องว่างพอดี */
+  gap: 36px;
 }
 
 .faculty-button {
   width: 100%;
-  padding: 30px;             /* ✅ ปุ่มใหญ่พอดี */
+  padding: 30px;
   background: #FFD700;
   color: #003366;
   border: none;
   border-radius: 60px;
-  font-size: 28px;           /* ✅ ข้อความใหญ่พอดี */
+  font-size: 28px;
   font-weight: bold;
   cursor: pointer;
   transition: transform 0.2s, background 0.3s, color 0.3s;
@@ -78,7 +79,7 @@ h1 {
   .container {
     max-width: 95%;
     padding: 50px 28px;
-    margin-top: -20px;       /* ✅ ดันขึ้นเล็กน้อย */
+    margin-top: -20px;
   }
 
   .school-logo {
@@ -108,5 +109,25 @@ h1 {
   .faculty-button {
     font-size: 22px;
     padding: 22px;
+  }
+}
+
+/* ✅ ปรับเฉพาะ Desktop จอใหญ่ */
+@media (min-width: 1024px) {
+  .school-logo {
+    width: 160px;   /* โลโก้เล็กลง */
+  }
+
+  h1 {
+    font-size: 24px;   /* ลดหัวข้อให้เล็กลงมาก */
+    margin-bottom: 30px;
+  }
+
+  .faculty-button {
+    font-size: 16px;   /* ลดตัวอักษรปุ่มลงเยอะ */
+    padding: 12px;     /* ลด padding ให้เล็กมาก */
+    max-width: 220px;  /* จำกัดความกว้างปุ่มให้เล็กลง */
+    margin: 0 auto;    /* จัดให้อยู่ตรงกลาง */
+    border-radius: 30px;
   }
 }
