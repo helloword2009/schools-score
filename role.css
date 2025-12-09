@@ -4,7 +4,7 @@ body {
   padding: 0;
 
   /* พื้นหลัง */
-  background-image: url("DSC_0694.jpg");
+  background-image: url('DSC_0694.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -103,3 +103,4 @@ h1 {
     padding: 7px;
   }
 }
+
