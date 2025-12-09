@@ -2,13 +2,18 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <!-- สำคัญมากสำหรับมือถือ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <title>เลือกบทบาท</title>
   <link rel="stylesheet" href="role.css">
- 
 </head>
 <body>
   <div class="role-container">
+    <!-- โลโก้โรงเรียน -->
     <img src="logo.jpg" alt="ตราโรงเรียนสตรีนครสวรรค์" class="school-logo">
+
+    <!-- หัวข้อ -->
     <h1>เลือกบทบาทเพื่อเข้าสู่ระบบ</h1>
 
     <!-- ปุ่มเลือกบทบาท -->
@@ -20,16 +25,14 @@
     function selectRole(role) {
       // เก็บบทบาทไว้ใน localStorage
       localStorage.setItem("userRole", role);
+
       // ส่งไปหน้าต่างๆตามบทบาท
       if (role === "student") {
         window.location = "select-faculty.html";
-      }else if (role === 'teacher') {
+      } else if (role === "teacher") {
         window.location = "login.html";
       }
-      //window.location = "login.html";
     }
   </script>
 </body>
-
 </html>
-
