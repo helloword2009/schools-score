@@ -4,7 +4,7 @@ body {
   padding: 0;
 
   /* พื้นหลัง */
-  background-image: url('DSC_0694.jpg');
+  background-image: url("DSC_0694.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -15,45 +15,53 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh; /* ใช้ min-height แทน height เพื่อยืดหยุ่น */
+  padding: 0 16px;   /* เพิ่ม padding ด้านข้าง */
 }
 
 .role-container {
   background-color: #ffffff;
   border: 3px solid #FFD700;
   border-radius: 10px;
-  padding: 30px 20px;
-  width: 90%;            /* ยืดหยุ่นตามจอ */
-  max-width: 400px;      /* จำกัดไม่ให้ใหญ่เกิน */
+  padding: 24px 16px;   /* ลด padding ให้พอดีมือถือ */
+  width: 100%;
+  max-width: 360px;     /* จำกัดความกว้างให้เหมาะกับมือถือ */
+  margin: 20px auto;    /* เพิ่มระยะห่างจากขอบจอ */
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   text-align: center;
 }
 
 .school-logo {
-  width: 100px;          /* โลโก้เล็กลงเล็กน้อย */
+  width: 90px;          /* โลโก้เล็กลงเล็กน้อย */
   height: auto;
-  margin-bottom: 20px;
+  margin: 0 auto 16px auto; /* จัดให้อยู่ตรงกลางและมีระยะห่างด้านล่าง */
+  display: block;           /* บังคับให้เป็น block element */
+  mix-blend-mode: multiply;
 }
 
 h1 {
   margin: 0 auto 20px auto;
-  font-size: 20px;
+  font-size: 18px;
   color: #ffcc00;
   background-color: #003366;
   border-radius: 6px;
-  padding: 10px;
-  display: inline-block; /* ให้ข้อความอยู่พอดี ไม่บังคับความกว้าง */
+  padding: 8px 12px;
+  display: inline-block; /* ให้ข้อความอยู่พอดี */
+  line-height: 1.4;
+  max-width: 90%;        /* ไม่ให้กว้างเกินจอ */
 }
+
 
 .role-button {
   display: block;
   width: 100%;
-  padding: 12px;
-  margin: 10px 0;
+  max-width: 280px;      /* จำกัดความกว้างของปุ่ม */
+  padding: 10px;
+  margin: 8px auto;
   background-color: #003366;
   color: #ffcc00;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
@@ -71,12 +79,27 @@ h1 {
   }
 
   h1 {
-    font-size: 18px;
-    padding: 8px;
+    font-size: 16px;
+    padding: 6px 10px;
   }
 
   .role-button {
     font-size: 14px;
-    padding: 10px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .school-logo {
+    width: 70px;
+  }
+
+  h1 {
+    font-size: 15px;
+  }
+
+  .role-button {
+    font-size: 13px;
+    padding: 7px;
   }
 }
