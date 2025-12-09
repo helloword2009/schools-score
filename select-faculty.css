@@ -15,95 +15,96 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 0 20px;   /* เพิ่ม padding ด้านข้าง */
+  padding: 0 24px;   /* เพิ่ม padding ด้านข้าง */
 }
 
 /* กล่องหลัก */
 .container {
   background-color: #ffffff;
-  border: 3px solid #FFD700;
-  border-radius: 18px;
-  padding: 48px 28px;        /* ✅ เพิ่ม padding ให้ใหญ่ขึ้น */
+  border: 4px solid #FFD700;
+  border-radius: 22px;
+  padding: 60px 36px;        /* ✅ เพิ่ม padding ให้ใหญ่ขึ้นมาก */
   width: 100%;
-  max-width: 520px;          /* ✅ ขยายความกว้าง */
-  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+  max-width: 640px;          /* ✅ ขยายความกว้าง */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   text-align: center;
 }
 
 /* โลโก้โรงเรียน */
 .school-logo {
-  width: 160px;              /* ✅ โลโก้ใหญ่ขึ้น */
+  width: 200px;              /* ✅ โลโก้ใหญ่ขึ้นมาก */
   height: auto;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 /* หัวข้อ */
 h1 {
-  font-size: 30px;           /* ✅ ตัวอักษรใหญ่ขึ้น */
+  font-size: 36px;           /* ✅ ตัวอักษรใหญ่ขึ้นมาก */
   color: #003366;
-  margin-bottom: 36px;
-  line-height: 1.5;
+  margin-bottom: 48px;
+  line-height: 1.6;
 }
 
 /* ปุ่มเลือกคณะ */
 .faculty-buttons {
   display: flex;
   flex-direction: column;
-  gap: 24px;                 /* ✅ เพิ่มช่องว่างระหว่างปุ่ม */
+  gap: 32px;                 /* ✅ เพิ่มช่องว่างระหว่างปุ่ม */
 }
 
 .faculty-button {
   width: 100%;
-  padding: 22px;             /* ✅ ปุ่มใหญ่ขึ้น */
+  padding: 28px;             /* ✅ ปุ่มใหญ่ขึ้นมาก */
   background: #FFD700;
   color: #003366;
   border: none;
-  border-radius: 50px;
-  font-size: 22px;           /* ✅ ข้อความใหญ่ขึ้น */
+  border-radius: 60px;
+  font-size: 26px;           /* ✅ ข้อความใหญ่ขึ้นมาก */
   font-weight: bold;
   cursor: pointer;
   transition: transform 0.2s, background 0.3s, color 0.3s;
-  box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 14px rgba(0,0,0,0.35);
 }
 
 .faculty-button:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
   background: #003366;
   color: #FFD700;
 }
 
-/* ✅ Responsive สำหรับมือถือ */
+/* ✅ Responsive สำหรับ Tablet */
 @media (max-width: 768px) {
   .container {
     max-width: 95%;
-    padding: 40px 24px;
+    padding: 50px 28px;
   }
 
   .school-logo {
-    width: 140px;
+    width: 180px;
   }
 
   h1 {
-    font-size: 26px;
+    font-size: 32px;
   }
 
   .faculty-button {
-    font-size: 20px;
-    padding: 20px;
+    font-size: 24px;
+    padding: 24px;
   }
 }
 
+/* ✅ Responsive สำหรับมือถือเล็ก */
 @media (max-width: 480px) {
   .school-logo {
-    width: 120px;
+    width: 150px;
   }
 
   h1 {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   .faculty-button {
-    font-size: 18px;
-    padding: 18px;
+    font-size: 22px;
+    padding: 22px;
   }
 }
