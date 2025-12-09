@@ -3,72 +3,80 @@ body {
   margin: 0;
   padding: 0;
 
-  /* ✅ ใช้หลาย background พร้อมกัน */
-  background-image:
-    /* linear-gradient(145deg, rgba(96, 169, 243, 0.6), rgba(0, 85, 170, 0.6)), */
-    url('DSC_0694.jpg');
-
-  background-size: cover;          /* ✅ ขยายภาพให้เต็มจอ */
-  background-position: center;     /* ✅ จัดตำแหน่งภาพให้อยู่ตรงกลาง */
-  background-repeat: no-repeat;    /* ✅ ไม่ให้ภาพซ้ำ */
-  background-attachment: fixed;    /* ✅ ให้ภาพนิ่งเวลาเลื่อนหน้า */
+  /* พื้นหลัง */
+  background-image: url('DSC_0694.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 
   text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh; /* ใช้ min-height แทน height เพื่อยืดหยุ่น */
 }
-    .role-container {
-      background-color: #ffffff;
-      border: 2px solid #003366;
-      border: 3px solid #FFD700;
-      border-radius: 10px;
-      padding: 40px 30px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
 
-    .school-logo {
-      width: 120px;
-      height: auto;
-      margin-bottom: 20px;
-    }
+.role-container {
+  background-color: #ffffff;
+  border: 3px solid #FFD700;
+  border-radius: 10px;
+  padding: 30px 20px;
+  width: 90%;            /* ยืดหยุ่นตามจอ */
+  max-width: 400px;      /* จำกัดไม่ให้ใหญ่เกิน */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
 
-    h1 {
-      margin-bottom: 30px;
-      margin-left: 40px;
-      width: 300px;
-      font-size: 22px;
-      color: #ffcc00;
-      background-color: #003366;
-      border-radius: 6px;
-      padding: 10px;    
-    }
+.school-logo {
+  width: 100px;          /* โลโก้เล็กลงเล็กน้อย */
+  height: auto;
+  margin-bottom: 20px;
+}
 
-    .role-button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      background-color: #003366;
-      color: #ffcc00;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+h1 {
+  margin: 0 auto 20px auto;
+  font-size: 20px;
+  color: #ffcc00;
+  background-color: #003366;
+  border-radius: 6px;
+  padding: 10px;
+  display: inline-block; /* ให้ข้อความอยู่พอดี ไม่บังคับความกว้าง */
+}
 
-    .role-button:hover {
-      background-color: #d6f605;
-      color: rgb(21, 5, 244);
-    }
-    header {
-      color:#f5f7f8
+.role-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background-color: #003366;
+  color: #ffcc00;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    }
+.role-button:hover {
+  background-color: #d6f605;
+  color: rgb(21, 5, 244);
+}
 
+/* ✅ Responsive สำหรับมือถือ */
+@media (max-width: 768px) {
+  .school-logo {
+    width: 80px; /* โลโก้เล็กลงบนมือถือ */
+  }
+
+  h1 {
+    font-size: 18px;
+    padding: 8px;
+  }
+
+  .role-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
