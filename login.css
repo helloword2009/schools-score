@@ -14,109 +14,109 @@ body.login-page {
 /* กล่องโปร่งกลางจอ */
 .login-overlay {
   background-color: rgb(249, 246, 246);
-  padding: 80px;                 /* ✅ กล่องใหญ่ขึ้น */
-  border-radius: 16px;
-  box-shadow: 0 0 40px rgba(0,0,0,0.25);
-  max-width: 500px;              /* ✅ กว้างขึ้น */
+  padding: 40px;                 /* ลดขนาดกล่องลง */
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.2);
+  max-width: 400px;              /* ลดความกว้าง */
   width: 95%;
   text-align: center;
 }
 
 /* โลโก้โรงเรียน */
 .school-logo {
-  width: 120px;                  /* ✅ โลโก้ใหญ่ขึ้น */
-  margin-bottom: 20px;
+  width: 100px;                  /* ลดโลโก้ลง */
+  margin-bottom: 16px;
   mix-blend-mode: multiply;
 }
 
 /* หัวข้อ */
 .login-box h1 {
-  font-size: 36px;               /* ✅ ตัวอักษรใหญ่ขึ้น */
+  font-size: 28px;               /* ลดหัวข้อ */
   color: #003366;
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
 }
 
 .login-box p {
-  font-size: 20px;               /* ✅ ข้อความใหญ่ขึ้น */
+  font-size: 16px;               /* ลดข้อความ */
   color: #555;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 /* ช่องกรอก */
 .login-box input {
   display: block;
   width: 100%;
-  padding: 16px;                 /* ✅ ช่องกรอกใหญ่ขึ้น */
-  margin-bottom: 20px;
+  padding: 12px;                 /* ลด padding */
+  margin-bottom: 16px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 18px;               /* ✅ ตัวอักษรใหญ่ขึ้น */
+  border-radius: 6px;
+  font-size: 16px;               /* ลดตัวอักษร */
   box-sizing: border-box;
 }
 
 .login-box input::placeholder {
   color: #aaa;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .login-box input:focus {
   border-color: #0055aa;
   outline: none;
-  box-shadow: 0 0 8px rgba(0, 85, 170, 0.5);
+  box-shadow: 0 0 6px rgba(0, 85, 170, 0.4);
 }
 
 /* ปุ่ม */
 .login-box button {
-  padding: 18px;                 /* ✅ ปุ่มใหญ่ขึ้น */
+  padding: 14px;                 /* ลดปุ่มลง */
   background: #003366;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 20px;               /* ✅ ตัวอักษรใหญ่ขึ้น */
+  font-size: 16px;               /* ลดตัวอักษร */
   width: 100%;
   transition: background 0.3s ease, transform 0.2s;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .login-box button:hover {
   background: #0055aa;
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 /* ข้อความแจ้งเตือน */
 #msg {
-  margin-top: 12px;
+  margin-top: 10px;
   color: red;
-  font-size: 16px;               /* ✅ ใหญ่ขึ้น */
+  font-size: 14px;               /* ลดลงเล็กน้อย */
 }
 
 /* Responsive */
 @media (max-width: 480px) {
   .login-overlay {
-    padding: 40px 24px;
+    padding: 30px 20px;
     max-width: 95%;
   }
 
   .school-logo {
-    width: 100px;
+    width: 80px;
   }
 
   .login-box h1 {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .login-box p {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .login-box input {
-    font-size: 16px;
-    padding: 14px;
+    font-size: 14px;
+    padding: 10px;
   }
 
   .login-box button {
-    font-size: 18px;
-    padding: 16px;
+    font-size: 14px;
+    padding: 12px;
   }
 }
