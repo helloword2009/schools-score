@@ -15,56 +15,67 @@
     <!-- ตารางแยกตามประเภท -->
     <section>
       <h2>คะแนนมาสาย</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>เวลา</th>
-            <th>ห้องเรียน</th>
-            <th>คะแนน</th>
-            <th>รูปกิจกรรม</th>
-          </tr>
-        </thead>
-        <tbody id="lateTable"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>เวลา</th>
+              <th>ห้องเรียน</th>
+              <th>คะแนน</th>
+              <th>รูปกิจกรรม</th>
+              <th>แก้ไขคะแนน</th>
+            </tr>
+          </thead>
+          <tbody id="lateTable"></tbody>
+        </table>
+      </div>
     </section>
 
     <section>
       <h2>คะแนนการเข้าแถว</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>เวลา</th>
-            <th>ห้องเรียน</th>
-            <th>คะแนน</th>
-            <th>รูปกิจกรรม</th>
-          </tr>
-        </thead>
-        <tbody id="lineTable"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>เวลา</th>
+              <th>ห้องเรียน</th>
+              <th>คะแนน</th>
+              <th>รูปกิจกรรม</th>
+              <th>แก้ไขคะแนน</th>
+            </tr>
+          </thead>
+          <tbody id="lineTable"></tbody>
+        </table>
+      </div>
     </section>
 
     <section>
       <h2>คะแนนความสะอาด</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>เวลา</th>
-            <th>ห้องเรียน</th>
-            <th>คะแนน</th>
-            <th>รูปกิจกรรม</th>
-          </tr>
-        </thead>
-        <tbody id="cleanTable"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>เวลา</th>
+              <th>ห้องเรียน</th>
+              <th>คะแนน</th>
+              <th>รูปกิจกรรม</th>
+              <th>แก้ไขคะแนน</th>
+            </tr>
+          </thead>
+          <tbody id="cleanTable"></tbody>
+        </table>
+      </div>
     </section>
 
     <!-- สรุปคะแนนรวม -->
     <div class="summary" id="summaryBox"></div>
   </main>
 
-  <button class="back-btn" onclick="window.location.href='summary.html'">
-    สรุปผลคณะยอดเยี่ยมประจำสัปดาห์
-  </button>
+  <div class="action-buttons">
+    <button class="back-btn" onclick="window.location.href='summary.html'">
+      สรุปผลคณะยอดเยี่ยมประจำสัปดาห์
+    </button>
+  </div>
 
   <footer>
     <p>© โรงเรียนสตรีนครสวรรค์</p>
@@ -75,85 +86,117 @@
     <img id="popupImage" src="">
   </div>
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const facultyName = params.get("faculty");
-  document.getElementById("facultyTitle").innerText = "คะแนนคณะสี " + facultyName;
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
-  let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
-  let facultyHistory = history.filter(item => item.faculty === facultyName);
+  <script>
+    // ✅ Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
+      authDomain: "school-scores-8e9eb.firebaseapp.com",
+      databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "school-scores-8e9eb",
+      storageBucket: "school-scores-8e9eb.firebasestorage.app",
+      messagingSenderId: "416720346956",
+      appId: "1:416720346956:web:b20e84af0b635b374279e9",
+      measurementId: "G-DD7E1RFNC1"
+    };
 
-  let total = 0;
-  let totalsByType = { "คะแนนมาสาย": 0, "คะแนนการเข้าแถว": 0, "คะแนนความสะอาด": 0 };
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  function renderByType(type, tableId) {
-    const filtered = facultyHistory.filter(item => item.type === type);
-    const tbody = document.getElementById(tableId);
-    tbody.innerHTML = "";
+    // ✅ ดึงชื่อคณะจาก URL
+    const params = new URLSearchParams(window.location.search);
+    const facultyName = params.get("faculty");
+    document.getElementById("facultyTitle").innerText = "คะแนนคณะสี " + facultyName;
 
-    filtered.forEach(item => {
-      total += item.value;
-      totalsByType[type] += item.value;
+    let facultyHistory = [];
+    let totalsByType = { "คะแนนมาสาย": 0, "คะแนนการเข้าแถว": 0, "คะแนนความสะอาด": 0 };
+    let total = 0;
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.time}</td>
-        <td>${item.classroom}</td>
-        <td>${item.value}</td>
-        <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
-      `;
-      tbody.appendChild(row);
+    // ✅ ฟังก์ชัน render ตาราง
+    function renderByType(type, tableId) {
+      const filtered = facultyHistory.filter(item => item.type === type);
+      const tbody = document.getElementById(tableId);
+      tbody.innerHTML = "";
+
+      filtered.forEach((item, index) => {
+        total += item.value;
+        totalsByType[type] += item.value;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.time}</td>
+          <td>${item.classroom}</td>
+          <td>${item.value}</td>
+          <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
+          <td><button onclick="editScore(${index}, '${type}')">แก้ไข</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // ✅ โหลดข้อมูลจาก Firebase
+    db.ref("scores").orderByChild("faculty").equalTo(facultyName).on("value", (snapshot) => {
+      facultyHistory = [];
+      total = 0;
+      totalsByType = { "คะแนนมาสาย": 0, "คะแนนการเข้าแถว": 0, "คะแนนความสะอาด": 0 };
+
+      const data = snapshot.val();
+      for (let key in data) {
+        facultyHistory.push({ ...data[key], key });
+      }
+
+      renderByType("คะแนนมาสาย", "lateTable");
+      renderByType("คะแนนการเข้าแถว", "lineTable");
+      renderByType("คะแนนความสะอาด", "cleanTable");
+
+      // ✅ สรุปคะแนนรวม
+      let summaryBox = document.getElementById("summaryBox");
+      summaryBox.innerHTML = "";
+      for (const type in totalsByType) {
+        const card = document.createElement("div");
+        card.className = "summary-card";
+        card.innerHTML = `<h3>${type}</h3><p>${totalsByType[type]} คะแนน</p>`;
+        summaryBox.appendChild(card);
+      }
+      const totalCard = document.createElement("div");
+      totalCard.className = "summary-card total";
+      totalCard.innerHTML = `<h3>คะแนนรวมทั้งหมด</h3><p>${total} คะแนน</p>`;
+      summaryBox.appendChild(totalCard);
     });
-  }
 
-  // ✅ เรียก render สำหรับแต่ละประเภท
-  renderByType("คะแนนมาสาย", "lateTable");
-  renderByType("คะแนนการเข้าแถว", "lineTable");
-  renderByType("คะแนนความสะอาด", "cleanTable");
+    // ✅ ฟังก์ชันแก้ไขคะแนน
+    function editScore(index, type) {
+      const filtered = facultyHistory.filter(item => item.type === type);
+      const item = filtered[index];
 
-  // ✅ สรุปคะแนนรวม
-  let summaryBox = document.getElementById("summaryBox");
-  summaryBox.innerHTML = "";
-  for (const type in totalsByType) {
-    const card = document.createElement("div");
-    card.className = "summary-card";
-    card.innerHTML = `<h3>${type}</h3><p>${totalsByType[type]} คะแนน</p>`;
-    summaryBox.appendChild(card);
-  }
-  const totalCard = document.createElement("div");
-  totalCard.className = "summary-card total";
-  totalCard.innerHTML = `<h3>คะแนนรวมทั้งหมด</h3><p>${total} คะแนน</p>`;
-  summaryBox.appendChild(totalCard);
+      const newClassroom = prompt("แก้ไขห้องเรียน:", item.classroom);
+      const newType = prompt("แก้ไขประเภทคะแนน:", item.type);
+      const newValue = prompt("แก้ไขคะแนน:", item.value);
 
-  // popup รูป
-  function openImagePopup(src) {
-    document.getElementById("popupImage").src = src;
-    document.getElementById("imagePopup").style.display = "block";
-  }
-  function closePopup() {
-    document.getElementById("imagePopup").style.display = "none";
-  }
+      if (newClassroom !== null && newType !== null && newValue !== null && !isNaN(newValue)) {
+        const updatedItem = {
+          ...item,
+          classroom: newClassroom,
+          type: newType,
+          value: parseInt(newValue)
+        };
 
-  // reset รายสัปดาห์
-  function checkWeeklyReset() {
-    const now = new Date();
-    let weekStart = localStorage.getItem("weekStart");
-    if (!weekStart) {
-      localStorage.setItem("weekStart", now.toISOString());
-      return;
+        // อัปเดตไปที่ Firebase
+        db.ref("scores/" + item.key).update(updatedItem);
+      }
     }
-    const startDate = new Date(weekStart);
-    const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-    if (diffDays >= 7) {
-      localStorage.removeItem("scoreHistory");
-      localStorage.setItem("weekStart", now.toISOString());
-      alert("ระบบได้รีเซ็ตคะแนนประจำสัปดาห์แล้ว ✅");
-    }
-  }
-  document.addEventListener("DOMContentLoaded", checkWeeklyReset);
-</script>
 
+    // ✅ popup รูป
+    function openImagePopup(src) {
+      document.getElementById("popupImage").src = src;
+      document.getElementById("imagePopup").style.display = "block";
+    }
+    function closePopup() {
+      document.getElementById("imagePopup").style.display = "none";
+    }
+  </script>
 </body>
 </html>
-
-
