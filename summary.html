@@ -5,6 +5,7 @@
   <title>สรุปผลคณะยอดเยี่ยมประจำสัปดาห์</title>
   <link rel="stylesheet" href="summary.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 <body>
   <header>
@@ -25,83 +26,62 @@
     </table>
   </main>
 
+
   <footer>
-    <p>© โรงเรียนสตรีนครสวรรค์ | <a href="report.html">พิมพ์รายงาน</a></p>
+    <p>© โรงเรียนสตรีนครสวรรค์ |<a href="report.html"> พิมพ์รายงาน</a></p>
   </footer>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
   <script>
-    // ✅ Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
-      authDomain: "school-scores-8e9eb.firebaseapp.com",
-      databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "school-scores-8e9eb",
-      storageBucket: "school-scores-8e9eb.firebasestorage.app",
-      messagingSenderId: "416720346956",
-      appId: "1:416720346956:web:b20e84af0b635b374279e9",
-      measurementId: "G-DD7E1RFNC1"
-    };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // ✅ รายชื่อคณะทั้ง 5
-    const faculties = [
-      "มาลัยพิรุณ",
-      "ไพรจิตเวหาส",
-      "โอภาสรวี",
-      "จันทราอำไพร",
-      "รัศมีดารา"
-    ];
-
     function calculateSummary() {
-      db.ref("scores").once("value", (snapshot) => {
-        const data = snapshot.val() || {};
+      const history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
 
-        // รวมคะแนนตามคณะ
-        const totals = {};
-        faculties.forEach(f => totals[f] = 0);
+      // ✅ รายชื่อคณะทั้ง 5
+      const faculties = [
+        "มาลัยพิรุณ",
+        "ไพรจิตเวหาส",
+        "โอภาสรวี",
+        "จันทราอำไพร",
+        "รัศมีดารา"
+      ];
 
-        for (let key in data) {
-          const item = data[key];
-          if (totals[item.faculty] !== undefined) {
-            totals[item.faculty] += item.value;
-          }
+      // รวมคะแนนตามคณะ
+      const totals = {};
+      faculties.forEach(f => totals[f] = 0);
+
+      history.forEach(item => {
+        if (totals[item.faculty] !== undefined) {
+          totals[item.faculty] += item.value;
         }
+      });
 
-        // หาคณะคะแนนสูงสุด
-        let winner = null;
-        let maxScore = -Infinity;
-        faculties.forEach(f => {
-          if (totals[f] > maxScore) {
-            maxScore = totals[f];
-            winner = f;
-          }
-        });
-
-        // แสดงผลผู้ชนะ
-        const winnerBox = document.getElementById("winnerBox");
-        if (winner) {
-          winnerBox.innerHTML = `🏆 <strong>${winner}</strong> ได้เป็นคณะยอดเยี่ยมประจำสัปดาห์ ด้วยคะแนนรวม ${maxScore} คะแนน`;
-        } else {
-          winnerBox.innerHTML = "ยังไม่มีข้อมูลคะแนนในสัปดาห์นี้";
+      // หาคณะคะแนนสูงสุด
+      let winner = null;
+      let maxScore = -Infinity;
+      faculties.forEach(f => {
+        if (totals[f] > maxScore) {
+          maxScore = totals[f];
+          winner = f;
         }
+      });
 
-        // เติมตารางสรุปครบ 5 คณะ
-        const tbody = document.getElementById("summaryTable").querySelector("tbody");
-        tbody.innerHTML = "";
-        faculties.forEach(f => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${f}</td>
-            <td>${totals[f]}</td>
-          `;
-          tbody.appendChild(row);
-        });
+      // แสดงผลผู้ชนะ
+      const winnerBox = document.getElementById("winnerBox");
+      if (winner) {
+        winnerBox.innerHTML = `🏆 <strong>${winner}</strong> ได้เป็นคณะยอดเยี่ยมประจำสัปดาห์ ด้วยคะแนนรวม ${maxScore} คะแนน`;
+      } else {
+        winnerBox.innerHTML = "ยังไม่มีข้อมูลคะแนนในสัปดาห์นี้";
+      }
+
+      // เติมตารางสรุปครบ 5 คณะ
+      const tbody = document.getElementById("summaryTable").querySelector("tbody");
+      tbody.innerHTML = "";
+      faculties.forEach(f => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${f}</td>
+          <td>${totals[f]}</td>
+        `;
+        tbody.appendChild(row);
       });
     }
 
