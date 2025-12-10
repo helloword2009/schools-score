@@ -15,6 +15,7 @@ body {
 
   text-align: center;
 }
+
 /* เพิ่มเลเยอร์สีขาวทับภาพพื้นหลังเพื่อให้ข้อความอ่านง่ายขึ้น */
 body::before {
   content: "";
@@ -29,7 +30,6 @@ h1 {
   color: #014a93;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
-
 
 /* Header */
 header {
@@ -81,5 +81,3 @@ main {
   font-size: 18px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-
-
