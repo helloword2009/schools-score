@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <title>คะแนนคณะสี</title>
   <link rel="stylesheet" href="faculty-score.css">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 <body>
   <header>
@@ -86,36 +88,17 @@
     <img id="popupImage" src="">
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
   <script>
-    // ✅ Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
-      authDomain: "school-scores-8e9eb.firebaseapp.com",
-      databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "school-scores-8e9eb",
-      storageBucket: "school-scores-8e9eb.firebasestorage.app",
-      messagingSenderId: "416720346956",
-      appId: "1:416720346956:web:b20e84af0b635b374279e9",
-      measurementId: "G-DD7E1RFNC1"
-    };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // ✅ ดึงชื่อคณะจาก URL
     const params = new URLSearchParams(window.location.search);
     const facultyName = params.get("faculty");
     document.getElementById("facultyTitle").innerText = "คะแนนคณะสี " + facultyName;
 
-    let facultyHistory = [];
-    let totalsByType = { "คะแนนมาสาย": 0, "คะแนนการเข้าแถว": 0, "คะแนนความสะอาด": 0 };
-    let total = 0;
+    let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
+    let facultyHistory = history.filter(item => item.faculty === facultyName);
 
-    // ✅ ฟังก์ชัน render ตาราง
+    let total = 0;
+    let totalsByType = { "คะแนนมาสาย": 0, "คะแนนการเข้าแถว": 0, "คะแนนความสะอาด": 0 };
+
     function renderByType(type, tableId) {
       const filtered = facultyHistory.filter(item => item.type === type);
       const tbody = document.getElementById(tableId);
@@ -137,59 +120,60 @@
       });
     }
 
-    // ✅ โหลดข้อมูลจาก Firebase
-    db.ref("scores").orderByChild("faculty").equalTo(facultyName).on("value", (snapshot) => {
-      facultyHistory = [];
-      total = 0;
-      totalsByType = { "คะแนนมาสาย": 0, "คะแนนการเข้าแถว": 0, "คะแนนความสะอาด": 0 };
-
-      const data = snapshot.val();
-      for (let key in data) {
-        facultyHistory.push({ ...data[key], key });
-      }
-
-      renderByType("คะแนนมาสาย", "lateTable");
-      renderByType("คะแนนการเข้าแถว", "lineTable");
-      renderByType("คะแนนความสะอาด", "cleanTable");
-
-      // ✅ สรุปคะแนนรวม
-      let summaryBox = document.getElementById("summaryBox");
-      summaryBox.innerHTML = "";
-      for (const type in totalsByType) {
-        const card = document.createElement("div");
-        card.className = "summary-card";
-        card.innerHTML = `<h3>${type}</h3><p>${totalsByType[type]} คะแนน</p>`;
-        summaryBox.appendChild(card);
-      }
-      const totalCard = document.createElement("div");
-      totalCard.className = "summary-card total";
-      totalCard.innerHTML = `<h3>คะแนนรวมทั้งหมด</h3><p>${total} คะแนน</p>`;
-      summaryBox.appendChild(totalCard);
-    });
+    // ✅ เรียก render สำหรับแต่ละประเภท
+    renderByType("คะแนนมาสาย", "lateTable");
+    renderByType("คะแนนการเข้าแถว", "lineTable");
+    renderByType("คะแนนความสะอาด", "cleanTable");
 
     // ✅ ฟังก์ชันแก้ไขคะแนน
     function editScore(index, type) {
-      const filtered = facultyHistory.filter(item => item.type === type);
-      const item = filtered[index];
+  const filtered = facultyHistory.filter(item => item.type === type);
+  const item = filtered[index];
 
-      const newClassroom = prompt("แก้ไขห้องเรียน:", item.classroom);
-      const newType = prompt("แก้ไขประเภทคะแนน:", item.type);
-      const newValue = prompt("แก้ไขคะแนน:", item.value);
+  // เปิด prompt ให้แก้ไขข้อมูล
+  const newClassroom = prompt("แก้ไขห้องเรียน:", item.classroom);
+  const newType = prompt("แก้ไขประเภทคะแนน (เช่น คะแนนมาสาย, คะแนนการเข้าแถว, คะแนนความสะอาด):", item.type);
+  const newValue = prompt("แก้ไขคะแนน:", item.value);
 
-      if (newClassroom !== null && newType !== null && newValue !== null && !isNaN(newValue)) {
-        const updatedItem = {
-          ...item,
-          classroom: newClassroom,
-          type: newType,
-          value: parseInt(newValue)
-        };
+  if (newClassroom !== null && newType !== null && newValue !== null && !isNaN(newValue)) {
+    // อัปเดตค่าใน facultyHistory
+    item.classroom = newClassroom;
+    item.type = newType;
+    item.value = parseInt(newValue);
 
-        // อัปเดตไปที่ Firebase
-        db.ref("scores/" + item.key).update(updatedItem);
-      }
+    // อัปเดตกลับไปใน history
+    const targetIndex = history.findIndex(h =>
+      h.faculty === item.faculty &&
+      h.time === item.time &&
+      h.classroom === item.classroom &&
+      h.type === type
+    );
+
+    if (targetIndex !== -1) {
+      history[targetIndex] = item;
     }
 
-    // ✅ popup รูป
+    localStorage.setItem("scoreHistory", JSON.stringify(history));
+    location.reload(); // รีเฟรชหน้าเพื่อแสดงผลใหม่
+  }
+}
+
+
+    // ✅ สรุปคะแนนรวม
+    let summaryBox = document.getElementById("summaryBox");
+    summaryBox.innerHTML = "";
+    for (const type in totalsByType) {
+      const card = document.createElement("div");
+      card.className = "summary-card";
+      card.innerHTML = `<h3>${type}</h3><p>${totalsByType[type]} คะแนน</p>`;
+      summaryBox.appendChild(card);
+    }
+    const totalCard = document.createElement("div");
+    totalCard.className = "summary-card total";
+    totalCard.innerHTML = `<h3>คะแนนรวมทั้งหมด</h3><p>${total} คะแนน</p>`;
+    summaryBox.appendChild(totalCard);
+
+    // popup รูป
     function openImagePopup(src) {
       document.getElementById("popupImage").src = src;
       document.getElementById("imagePopup").style.display = "block";
@@ -197,6 +181,24 @@
     function closePopup() {
       document.getElementById("imagePopup").style.display = "none";
     }
+
+    // reset รายสัปดาห์
+    function checkWeeklyReset() {
+      const now = new Date();
+      let weekStart = localStorage.getItem("weekStart");
+      if (!weekStart) {
+        localStorage.setItem("weekStart", now.toISOString());
+        return;
+      }
+      const startDate = new Date(weekStart);
+      const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+      if (diffDays >= 7) {
+        localStorage.removeItem("scoreHistory");
+        localStorage.setItem("weekStart", now.toISOString());
+        alert("ระบบได้รีเซ็ตคะแนนประจำสัปดาห์แล้ว ✅");
+      }
+    }
+    document.addEventListener("DOMContentLoaded", checkWeeklyReset);
   </script>
 </body>
 </html>
