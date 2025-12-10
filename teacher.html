@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>หน้าสำหรับครู</title>
-  <link rel="stylesheet" href="teacher.css">
+  <link rel="stylesheet" href="styles/teacher.css">
   <!-- ✅ โหลด auth.js ก่อน เพื่อให้มี facultyClassroom ใช้งาน -->
-  <script src="auth.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="scripts/auth.js"></script>
 </head>
 <body>
   <header>
@@ -23,7 +22,6 @@
       
       <div class="form-group">
         <label for="classroom">ห้องเรียน:</label>
-        <!-- ✅ เปลี่ยนเป็น select -->
         <select id="classroom" class="form-control" required></select>
       </div>
 
@@ -73,7 +71,26 @@
     <img id="popupImage" src="">
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
   <script>
+    // ✅ Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
+      authDomain: "school-scores-8e9eb.firebaseapp.com",
+      databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "school-scores-8e9eb",
+      storageBucket: "school-scores-8e9eb.firebasestorage.app",
+      messagingSenderId: "416720346956",
+      appId: "1:416720346956:web:b20e84af0b635b374279e9",
+      measurementId: "G-DD7E1RFNC1"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     // ✅ ดึงคณะจาก localStorage
     const faculty = localStorage.getItem("currentFaculty");
     document.getElementById("facultyName").innerText = faculty || "ไม่พบข้อมูลคณะ";
@@ -90,6 +107,7 @@
       });
     }
 
+    // ✅ เพิ่มคะแนน
     function addScore(event) {
       event.preventDefault();
 
@@ -113,10 +131,10 @@
       }
     }
 
+    // ✅ บันทึกลง Firebase
     function saveHistory(faculty, classroom, type, value, time, imageData) {
-      let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
-      history.push({ faculty, classroom, type, value, time, image: imageData });
-      localStorage.setItem("scoreHistory", JSON.stringify(history));
+      const newData = { faculty, classroom, type, value, time, image: imageData };
+      db.ref("scores").push(newData);
 
       renderHistory();
       document.getElementById("scoreValue").value = "";
@@ -125,37 +143,46 @@
       setTimeout(() => { document.getElementById("msg").innerText = ""; }, 3000);
     }
 
+    // ✅ แสดงประวัติจาก Firebase
     function renderHistory() {
-      const history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
-      const tbody = document.getElementById("historyTable").querySelector("tbody");
-      tbody.innerHTML = "";
+      db.ref("scores").orderByChild("faculty").equalTo(faculty).on("value", (snapshot) => {
+        const data = snapshot.val();
+        const tbody = document.getElementById("historyTable").querySelector("tbody");
+        tbody.innerHTML = "";
 
-      history.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.time}</td>
-          <td>${item.faculty}</td>
-          <td>${item.classroom}</td>
-          <td>${item.type}</td>
-          <td>${item.value > 0 ? "+" + item.value : item.value}</td>
-          <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
-        `;
-        tbody.appendChild(row);
+        for (let key in data) {
+          const item = data[key];
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.time}</td>
+            <td>${item.faculty}</td>
+            <td>${item.classroom}</td>
+            <td>${item.type}</td>
+            <td>${item.value > 0 ? "+" + item.value : item.value}</td>
+            <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
+          `;
+          tbody.appendChild(row);
+        }
       });
     }
 
+    // ✅ รีเซ็ตข้อมูลใน Firebase
     function resetHistory() {
       if (confirm("คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติทั้งหมด?")) {
-        localStorage.removeItem("scoreHistory");
+        db.ref("scores").orderByChild("faculty").equalTo(faculty).once("value", (snapshot) => {
+          snapshot.forEach((child) => {
+            child.ref.remove();
+          });
+        });
         renderHistory();
       }
     }
 
+    // ✅ popup รูป
     function openImagePopup(src) {
       document.getElementById("popupImage").src = src;
       document.getElementById("imagePopup").style.display = "block";
     }
-
     function closePopup() {
       document.getElementById("imagePopup").style.display = "none";
     }
@@ -168,5 +195,3 @@
   </footer>
 </body>
 </html>
-
-
