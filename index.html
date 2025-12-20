@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>คะแนนคณะสีโรงเรียนสตรีนครสวรรค์</title>
   <link rel="stylesheet" href="index.css">
 </head>
-
 <body>
   <header>
     <img src="logo.jpg" alt="ตราโรงเรียนสตรีนครสวรรค์" class="school-logo">
@@ -24,13 +22,13 @@
 
   <main>
     <a href="role.html" class="login-btn">เข้าสู่ระบบ</a>
-    <!-- ✅ พื้นที่แสดงคะแนน -->
-    <div id="scoreboard"></div>
+    <!-- ✅ พื้นที่แสดงคะแนนรวม -->
+
   </main>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <!-- ✅ Firebase SDK แบบ UMD (เวอร์ชัน 8) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
     // Config ของโปรเจกต์ (คัดลอกจาก Firebase Console)
@@ -46,33 +44,38 @@
     };
 
     // เริ่มต้น Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ✅ ฟังก์ชันบันทึกคะแนน
-    function saveScore(faculty, type, value) {
-      const newData = {
-        faculty: faculty,
-        type: type,
-        value: value,
-        time: new Date().toLocaleString()
-      };
-      db.ref("scores").push(newData);
-    }
-
-    // ✅ ฟังก์ชันโหลดคะแนน
+    // ✅ ฟังก์ชันโหลดคะแนนรวม
     function loadScores() {
       db.ref("scores").on("value", (snapshot) => {
-        const data = snapshot.val();
+        const data = snapshot.val() || {};
         const container = document.getElementById("scoreboard");
         container.innerHTML = "";
 
+        // รายชื่อคณะสี
+        const faculties = ["มาลัยพิรุณ","ไพจิตเวหาส","โอภาสรวี","จันทราอำไพ","รัศมีดารา"];
+        const totals = {};
+        faculties.forEach(f => totals[f] = 0);
+
+        // รวมคะแนนตามคณะ
         for (let key in data) {
           const item = data[key];
-          container.innerHTML += `
-            <div>${item.faculty} - ${item.type}: ${item.value} คะแนน (${item.time})</div>
-          `;
+          if (totals[item.faculty] !== undefined) {
+            totals[item.faculty] += item.value;
+          }
         }
+
+        // แสดงผลคะแนนรวม
+        faculties.forEach(f => {
+          container.innerHTML += `
+            <div class="score-card">
+              <h3>${f}</h3>
+              <p>${totals[f]} คะแนน</p>
+            </div>
+          `;
+        });
       });
     }
 
@@ -80,5 +83,4 @@
     document.addEventListener("DOMContentLoaded", loadScores);
   </script>
 </body>
-
 </html>
