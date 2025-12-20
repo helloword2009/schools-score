@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>หน้าสำหรับครู</title>
   <link rel="stylesheet" href="teacher.css">
-  <!-- ✅ โหลด auth.js ก่อน เพื่อให้มี facultyClassroom ใช้งาน -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- โหลด auth.js ก่อน เพื่อให้มี facultyClassroom ใช้งาน -->
   <script src="auth.js"></script>
 </head>
 <body>
@@ -14,7 +15,6 @@
 
   <main>
     <form onsubmit="addScore(event)" class="form-card">
-      <!-- ✅ แสดงคณะสีจาก login -->
       <div class="form-group">
         <label>คณะสี:</label>
         <span id="facultyName" class="faculty-label"></span>
@@ -22,7 +22,6 @@
       
       <div class="form-group">
         <label for="classroom">ห้องเรียน:</label>
-        <!-- ✅ เปลี่ยนเป็น select -->
         <select id="classroom" class="form-control" required></select>
       </div>
 
@@ -72,21 +71,45 @@
     <img id="popupImage" src="">
   </div>
 
+  <!-- Firebase SDK แบบ UMD (เวอร์ชัน 8) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <script>
-    // ✅ ดึงคณะจาก localStorage
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
+      authDomain: "school-scores-8e9eb.firebaseapp.com",
+      databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "school-scores-8e9eb",
+      storageBucket: "school-scores-8e9eb.firebasestorage.app",
+      messagingSenderId: "416720346956",
+      appId: "1:416720346956:web:b20e84af0b635b374279e9",
+      measurementId: "G-DD7E1RFNC1"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // ดึงคณะจาก localStorage
     const faculty = localStorage.getItem("currentFaculty");
     document.getElementById("facultyName").innerText = faculty || "ไม่พบข้อมูลคณะ";
 
-    // ✅ เติม dropdown ห้องเรียนจาก facultyClassroom ที่อยู่ใน auth.js
+    // เติม dropdown ห้องเรียนจาก facultyClassroom
     const classroomSelect = document.getElementById("classroom");
     classroomSelect.innerHTML = "";
-    if (facultyClassroom[faculty]) {
+    if (faculty && facultyClassroom && facultyClassroom[faculty]) {
       facultyClassroom[faculty].forEach(room => {
         const opt = document.createElement("option");
         opt.value = room;
         opt.textContent = room;
         classroomSelect.appendChild(opt);
       });
+    } else {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "ไม่พบข้อมูลห้องเรียน";
+      classroomSelect.appendChild(opt);
     }
 
     function addScore(event) {
@@ -113,11 +136,9 @@
     }
 
     function saveHistory(faculty, classroom, type, value, time, imageData) {
-      let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
-      history.push({ faculty, classroom, type, value, time, image: imageData });
-      localStorage.setItem("scoreHistory", JSON.stringify(history));
+      const newData = { faculty, classroom, type, value, time, image: imageData };
+      db.ref("scores").push(newData);
 
-      renderHistory();
       document.getElementById("scoreValue").value = "";
       document.getElementById("activityImage").value = "";
       document.getElementById("msg").innerText = "บันทึกคะแนนเรียบร้อยแล้ว ✅";
@@ -125,28 +146,34 @@
     }
 
     function renderHistory() {
-      const history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
-      const tbody = document.getElementById("historyTable").querySelector("tbody");
-      tbody.innerHTML = "";
+      db.ref("scores").orderByChild("faculty").equalTo(faculty).on("value", (snapshot) => {
+        const data = snapshot.val() || {};
+        const tbody = document.getElementById("historyTable").querySelector("tbody");
+        tbody.innerHTML = "";
 
-      history.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.time}</td>
-          <td>${item.faculty}</td>
-          <td>${item.classroom}</td>
-          <td>${item.type}</td>
-          <td>${item.value > 0 ? "+" + item.value : item.value}</td>
-          <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
-        `;
-        tbody.appendChild(row);
+        for (let key in data) {
+          const item = data[key];
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.time}</td>
+            <td>${item.faculty}</td>
+            <td>${item.classroom}</td>
+            <td>${item.type}</td>
+            <td>${item.value > 0 ? "+" + item.value : item.value}</td>
+            <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
+          `;
+          tbody.appendChild(row);
+        }
       });
     }
 
     function resetHistory() {
       if (confirm("คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติทั้งหมด?")) {
-        localStorage.removeItem("scoreHistory");
-        renderHistory();
+        db.ref("scores").orderByChild("faculty").equalTo(faculty).once("value", (snapshot) => {
+          snapshot.forEach((child) => {
+            child.ref.remove();
+          });
+        });
       }
     }
 
