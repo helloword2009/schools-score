@@ -14,14 +14,14 @@
   <main>
     <!-- ตารางแยกตามประเภท -->
     <section>
-      <h2>คะแนนมาสาย</h2>
+      <h2>จำนวนคนมาสาย</h2>
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
               <th>เวลา</th>
               <th>ห้องเรียน</th>
-              <th>คะแนน</th>
+              <th>คน</th>
               <th>รูปกิจกรรม</th>
               <th>แก้ไขคะแนน</th>
             </tr>
@@ -86,110 +86,176 @@
     <img id="popupImage" src="">
   </div>
 
-  <!-- 🔧 เพิ่ม Firebase SDK -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const facultyName = params.get("faculty");
-    document.getElementById("facultyTitle").innerText = "คะแนนคณะสี " + facultyName;
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
+    authDomain: "school-scores-8e9eb.firebaseapp.com",
+    databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "school-scores-8e9eb",
+    storageBucket: "school-scores-8e9eb.firebasestorage.app",
+    messagingSenderId: "416720346956",
+    appId: "1:416720346956:web:b20e84af0b635b374279e9",
+    measurementId: "G-DD7E1RFNC1"
+  };
 
-    // 🔧 ลบ localStorage ออก แล้วใช้ Firebase แทน
-    // let history = JSON.parse(localStorage.getItem("scoreHistory")) || [];
-    // let facultyHistory = history.filter(item => item.faculty === facultyName);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    let total = 0;
-    let totalsByType = { "คะแนนมาสาย": 0, "คะแนนการเข้าแถว": 0, "คะแนนความสะอาด": 0 };
+  const params = new URLSearchParams(window.location.search);
+  const facultyName = (params.get("faculty") || "").trim();
+  document.getElementById("facultyTitle").innerText = "คะแนนคณะสี " + (facultyName || "-");
 
-    // 🔧 Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
-      authDomain: "school-scores-8e9eb.firebaseapp.com",
-      databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "school-scores-8e9eb",
-      storageBucket: "school-scores-8e9eb.firebasestorage.app",
-      messagingSenderId: "416720346956",
-      appId: "1:416720346956:web:b20e84af0b635b374279e9",
-      measurementId: "G-DD7E1RFNC1"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  const FACULTIES = ["มาลัยพิรุณ","ไพจิตเวหาส","โอภาสรวี","จันทราอำไพ","รัศมีดารา"];
 
-    // 🔧 render จาก Firebase
-    function renderByType(type, tableId) {
-      db.ref("scores").orderByChild("faculty").equalTo(facultyName).on("value", (snapshot) => {
-        const data = snapshot.val() || {};
-        const tbody = document.getElementById(tableId);
-        tbody.innerHTML = "";
+  const CLASSROOMS = {
+    "มาลัยพิรุณ": ["1/4","1/9","2/5","2/10","3/1","3/6","3/11","4/1","4/6","4/11","5/2","5/12","6/2","6/7","6/12"],
+    "ไพจิตเวหาส": ["1/5","1/10","2/1","2/6","2/11","3/2","3/7","3/12","4/2","4/12","5/3","5/8","6/3","6/8","6/11"],
+    "โอภาสรวี": ["1/1","1/6","1/11","2/2","2/7","3/3","3/8","4/3","4/8","4/13","5/4","5/9","5/11","6/4","6/9"],
+    "จันทราอำไพ": ["1/3","1/8","1/13","2/4","2/9","3/5","3/10","4/5","4/7","4/10","5/1","5/6","6/5","6/6","6/13"],
+    "รัศมีดารา": ["1/2","1/7","1/12","2/3","2/8","2/13","3/4","3/9","4/4","4/9","5/5","5/7","5/10","5/13","6/1","6/10"]
+  };
 
-        totalsByType[type] = 0; // reset ก่อนรวมใหม่
+  const TYPE_LATE = "คะแนนมาสาย";
+  const TYPE_LINEUP = "คะแนนการเข้าแถว";
+  const TYPE_CLEAN = "คะแนนความสะอาด";
+  const LATE_RANK_SCORES = [9, 8, 7, 6, 5];
 
-        Object.keys(data).forEach((key) => {
-          const item = data[key];
-          if (item.type === type) {
-            totalsByType[type] += item.value;
-            total += item.value;
+  let totalsByType = { [TYPE_LATE]: 0, [TYPE_LINEUP]: 0, [TYPE_CLEAN]: 0 };
 
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${item.time}</td>
-              <td>${item.classroom}</td>
-              <td>${item.value}</td>
-              <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
-              <td><button onclick="editScore('${key}', ${item.value})">แก้ไข</button></td>
-            `;
-            tbody.appendChild(row);
-          }
-        });
+  function openImagePopup(src) {
+    document.getElementById("popupImage").src = src;
+    document.getElementById("imagePopup").style.display = "block";
+  }
+  function closePopup() {
+    document.getElementById("imagePopup").style.display = "none";
+  }
+  window.openImagePopup = openImagePopup;
+  window.closePopup = closePopup;
 
-        updateSummary();
-      });
+  function editScore(key, oldValue) {
+    const newValue = prompt("แก้ไขคะแนน:", oldValue);
+    if (newValue !== null && !isNaN(newValue)) {
+      db.ref("scores/" + key).update({ value: Number(newValue) });
+      alert("แก้ไขคะแนนเรียบร้อยแล้ว ✅");
     }
+  }
+  window.editScore = editScore;
 
-    // 🔧 ฟังก์ชันแก้ไขคะแนนใน Firebase
-    function editScore(key, oldValue) {
-      const newValue = prompt("แก้ไขคะแนน:", oldValue);
-      if (newValue !== null && !isNaN(newValue)) {
-        db.ref("scores/" + key).update({ value: parseInt(newValue) });
-        alert("แก้ไขคะแนนเรียบร้อยแล้ว ✅");
+  function updateSummary() {
+    const summaryBox = document.getElementById("summaryBox");
+    summaryBox.innerHTML = "";
+
+    Object.keys(totalsByType).forEach((type) => {
+      const card = document.createElement("div");
+      card.className = "summary-card";
+      const val = Number(totalsByType[type]) || 0;
+      card.innerHTML = `<h3>${type}</h3><p>${val.toFixed(2)} คะแนน</p>`;
+      summaryBox.appendChild(card);
+    });
+
+    const total =
+      (Number(totalsByType[TYPE_LATE]) || 0) +
+      (Number(totalsByType[TYPE_LINEUP]) || 0) +
+      (Number(totalsByType[TYPE_CLEAN]) || 0);
+
+    const totalCard = document.createElement("div");
+    totalCard.className = "summary-card total";
+    totalCard.innerHTML = `<h3>คะแนนรวมทั้งหมด</h3><p>${total.toFixed(2)} คะแนน</p>`;
+    summaryBox.appendChild(totalCard);
+  }
+
+  db.ref("scores").on("value", (snapshot) => {
+    const data = snapshot.val() || {};
+
+    const lateTbody = document.getElementById("lateTable");
+    const lineTbody = document.getElementById("lineTable");
+    const cleanTbody = document.getElementById("cleanTable");
+    lateTbody.innerHTML = "";
+    lineTbody.innerHTML = "";
+    cleanTbody.innerHTML = "";
+
+    // ✅ lateCounts เฉพาะ 5 คณะ + เช็กว่ามี "ข้อมูลมาสายจริง" ไหม
+    const lateCounts = {};
+    const lateHasData = {};
+    FACULTIES.forEach(f => { lateCounts[f] = 0; lateHasData[f] = false; });
+
+    let lineupTotalThis = 0;
+    let cleanTotalThis = 0;
+
+    for (const key in data) {
+      const item = data[key] || {};
+      const f = (item.faculty || "").trim();
+      const v = Number(item.value) || 0;
+
+      // ✅ รวม late ตามคณะมาตรฐาน + mark ว่ามีข้อมูลจริง
+      if (item.type === TYPE_LATE && FACULTIES.includes(f)) {
+        lateCounts[f] += v;
+        lateHasData[f] = true;
+      }
+
+      // แสดงเฉพาะคณะหน้านี้
+      if (!facultyName || f !== facultyName) continue;
+
+      if (item.type === TYPE_LATE) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.time || "-"}</td>
+          <td>${item.classroom || "-"}</td>
+          <td>${v} คน</td>
+          <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
+          <td><button onclick="editScore('${key}', ${v})">แก้ไข</button></td>
+        `;
+        lateTbody.appendChild(row);
+      } else if (item.type === TYPE_LINEUP) {
+        lineupTotalThis += v;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.time || "-"}</td>
+          <td>${item.classroom || "-"}</td>
+          <td>${v}</td>
+          <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
+          <td><button onclick="editScore('${key}', ${v})">แก้ไข</button></td>
+        `;
+        lineTbody.appendChild(row);
+      } else if (item.type === TYPE_CLEAN) {
+        cleanTotalThis += v;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.time || "-"}</td>
+          <td>${item.classroom || "-"}</td>
+          <td>${v}</td>
+          <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
+          <td><button onclick="editScore('${key}', ${v})">แก้ไข</button></td>
+        `;
+        cleanTbody.appendChild(row);
       }
     }
 
-    // 🔧 สรุปคะแนนรวม
-    function updateSummary() {
-      total = 0;
-      for (const type in totalsByType) {
-        total += totalsByType[type];
-      }
+    // ✅ late score: คณะที่ "ไม่มีบันทึกมาสายเลย" => ถือว่าไม่ส่งข้อมูล => อยู่ท้ายสุด (Infinity)
+    let lateScoreThis = 5;
+    if (FACULTIES.includes(facultyName)) {
+      const sortedByLate = FACULTIES
+        .map(f => [f, lateHasData[f] ? lateCounts[f] : Number.POSITIVE_INFINITY])
+        .sort((a, b) => a[1] - b[1]);
 
-      const summaryBox = document.getElementById("summaryBox");
-      summaryBox.innerHTML = "";
-      for (const type in totalsByType) {
-        const card = document.createElement("div");
-        card.className = "summary-card";
-        card.innerHTML = `<h3>${type}</h3><p>${totalsByType[type]} คะแนน</p>`;
-        summaryBox.appendChild(card);
-      }
-      const totalCard = document.createElement("div");
-      totalCard.className = "summary-card total";
-      totalCard.innerHTML = `<h3>คะแนนรวมทั้งหมด</h3><p>${total} คะแนน</p>`;
-      summaryBox.appendChild(totalCard);
+      const idx = sortedByLate.findIndex(([f]) => f === facultyName);
+      lateScoreThis = LATE_RANK_SCORES[Math.min(idx, LATE_RANK_SCORES.length - 1)];
     }
 
-    // popup รูป
-    function openImagePopup(src) {
-      document.getElementById("popupImage").src = src;
-      document.getElementById("imagePopup").style.display = "block";
-    }
-    function closePopup() {
-      document.getElementById("imagePopup").style.display = "none";
-    }
+    // clean avg แบบเดียวกับ summary
+    const roomCount = CLASSROOMS[facultyName]?.length || 0;
+    const cleanAvgThis = roomCount > 0 ? (cleanTotalThis / roomCount) : 0;
 
-    // 🔧 เรียก render สำหรับแต่ละประเภท
-    renderByType("คะแนนมาสาย", "lateTable");
-    renderByType("คะแนนการเข้าแถว", "lineTable");
-    renderByType("คะแนนความสะอาด", "cleanTable");
-  </script>
+    totalsByType[TYPE_LATE] = lateScoreThis;
+    totalsByType[TYPE_LINEUP] = lineupTotalThis;
+    totalsByType[TYPE_CLEAN] = cleanAvgThis;
+
+    updateSummary();
+  });
+</script>
 </body>
 </html>
