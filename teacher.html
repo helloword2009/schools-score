@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>หน้าสำหรับครู</title>
-  <link rel="stylesheet" href="teacher.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- โหลด auth.js ก่อน เพื่อให้มี facultyClassroom ใช้งาน -->
-  <script src="auth.js"></script>
+  <link rel="stylesheet" href="styles/teacher.css">
+  <script src="scripts/auth.js"></script>
 </head>
 <body>
   <header>
@@ -28,15 +26,15 @@
       <div class="form-group">
         <label for="scoreType">ประเภทคะแนน:</label>
         <select id="scoreType" class="form-control" required>
-          <option value="คะแนนมาสาย">คะแนนคนมาสาย</option>
+          <option value="จำนวนคนมาสาย">จำนวนคนมาสาย</option>
           <option value="คะแนนความสะอาด">คะแนนความสะอาด</option>
           <option value="คะแนนการเข้าแถว">คะแนนการเข้าแถว</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="scoreValue">คะแนน:</label>
-        <input type="number" id="scoreValue" class="form-control" required>
+        <label for="scoreValue" id="scoreLabel">คะแนน:</label>
+        <input type="number" id="scoreValue" class="form-control" required placeholder="กรอกคะแนน">
       </div>
 
       <div class="form-group">
@@ -56,7 +54,7 @@
           <th>คณะสี</th>
           <th>ห้องเรียน</th>
           <th>ประเภทคะแนน</th>
-          <th>คะแนน</th>
+          <th>ค่า</th>
           <th>รูปกิจกรรม</th>
         </tr>
       </thead>
@@ -66,17 +64,14 @@
     <button class="reset-btn" onclick="resetHistory()">รีเซ็ตประวัติทั้งหมด</button>
   </main>
 
-  <!-- popup รูป -->
   <div id="imagePopup" onclick="closePopup()">
     <img id="popupImage" src="">
   </div>
 
-  <!-- Firebase SDK แบบ UMD (เวอร์ชัน 8) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <script>
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
       authDomain: "school-scores-8e9eb.firebaseapp.com",
@@ -91,11 +86,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ดึงคณะจาก localStorage
     const faculty = localStorage.getItem("currentFaculty");
     document.getElementById("facultyName").innerText = faculty || "ไม่พบข้อมูลคณะ";
 
-    // เติม dropdown ห้องเรียนจาก facultyClassroom
     const classroomSelect = document.getElementById("classroom");
     classroomSelect.innerHTML = "";
     if (faculty && facultyClassroom && facultyClassroom[faculty]) {
@@ -111,6 +104,24 @@
       opt.textContent = "ไม่พบข้อมูลห้องเรียน";
       classroomSelect.appendChild(opt);
     }
+
+    // เปลี่ยน label/placeholder ตามประเภทคะแนน
+    document.getElementById("scoreType").addEventListener("change", function() {
+      const type = this.value;
+      const label = document.getElementById("scoreLabel");
+      const input = document.getElementById("scoreValue");
+
+      if (type === "จำนวนคนมาสาย") {
+        label.innerText = "จำนวนคนมาสาย:";
+        input.placeholder = "กรอกจำนวนคนที่มาสาย";
+      } else if (type === "คะแนนความสะอาด") {
+        label.innerText = "คะแนนความสะอาด:";
+        input.placeholder = "กรอกคะแนนความสะอาด";
+      } else if (type === "คะแนนการเข้าแถว") {
+        label.innerText = "คะแนนการเข้าแถว:";
+        input.placeholder = "กรอกคะแนนการเข้าแถว";
+      }
+    });
 
     function addScore(event) {
       event.preventDefault();
@@ -141,7 +152,7 @@
 
       document.getElementById("scoreValue").value = "";
       document.getElementById("activityImage").value = "";
-      document.getElementById("msg").innerText = "บันทึกคะแนนเรียบร้อยแล้ว ✅";
+      document.getElementById("msg").innerText = "บันทึกข้อมูลเรียบร้อย ✅";
       setTimeout(() => { document.getElementById("msg").innerText = ""; }, 3000);
     }
 
@@ -154,12 +165,21 @@
         for (let key in data) {
           const item = data[key];
           const row = document.createElement("tr");
+
+          // ถ้าเป็นจำนวนคนมาสาย → แสดงเป็น "x คน"
+          let displayValue = item.value;
+          if (item.type === "จำนวนคนมาสาย") {
+            displayValue = item.value + " คน";
+          } else {
+            displayValue = item.value + " คะแนน";
+          }
+
           row.innerHTML = `
             <td>${item.time}</td>
             <td>${item.faculty}</td>
             <td>${item.classroom}</td>
             <td>${item.type}</td>
-            <td>${item.value > 0 ? "+" + item.value : item.value}</td>
+            <td>${displayValue}</td>
             <td>${item.image ? `<img src="${item.image}" class="activity-img" onclick="openImagePopup('${item.image}')">` : "-"}</td>
           `;
           tbody.appendChild(row);
@@ -191,6 +211,3 @@
 
   <footer>
     <p>© โรงเรียนสตรีนครสวรรค์ | <a href="select-faculty.html">ดูคะแนนคณะสี</a></p>
-  </footer>
-</body>
-</html>
