@@ -1,86 +1,83 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>คะแนนคณะสีโรงเรียนสตรีนครสวรรค์</title>
-  <link rel="stylesheet" href="index.css">
-</head>
-<body>
-  <header>
-    <img src="logo.jpg" alt="ตราโรงเรียนสตรีนครสวรรค์" class="school-logo">
-    <h1>ระบบคะแนนคณะสีโรงเรียนสตรีนครสวรรค์</h1>
-  </header>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Tahoma", sans-serif;
 
-  <!-- ✅ แบนเนอร์ข่าวสาร -->
-  <section class="news-banner">
-    <marquee behavior="scroll" direction="left">
-      🔔 คณะรัศมีได้คะแนนกิจกรรมหน้าเสาธงเพิ่ม 10 คะแนน | คณะจันทราเตรียมกิจกรรมวันพรุ่งนี้ |
-      คณะมาลัยชนะการแข่งขันตอบปัญหา
-    </marquee>
-  </section>
+  /* ✅ ใช้หลาย background พร้อมกัน */
+  background-image: 
+    /*linear-gradient(145deg, rgba(96, 169, 243, 0.6), rgba(0, 85, 170, 0.6)),*/
+    url("../images/DSC_0694.jpg");
 
-  <main>
-    <a href="role.html" class="login-btn">เข้าสู่ระบบ</a>
-    <!-- ✅ พื้นที่แสดงคะแนนรวม -->
+  background-size: cover;            /* ขยายภาพให้เต็มจอ */
+  background-position: center;       /* จัดตำแหน่งภาพให้อยู่ตรงกลาง */
+  background-repeat: no-repeat;      /* ไม่ให้ภาพซ้ำ */
+  background-attachment: fixed;      /* ให้ภาพนิ่งเวลาเลื่อนหน้า */
 
-  </main>
+  text-align: center;
+}
 
-  <!-- ✅ Firebase SDK แบบ UMD (เวอร์ชัน 8) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+/* เพิ่มเลเยอร์สีขาวทับภาพพื้นหลังเพื่อให้ข้อความอ่านง่ายขึ้น */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.4); /* ปรับค่า 0.4 ให้จางมากหรือน้อย */
+  z-index: -1; /* อยู่หลังข้อความ */
+}
 
-  <script>
-    // Config ของโปรเจกต์ (คัดลอกจาก Firebase Console)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
-      authDomain: "school-scores-8e9eb.firebaseapp.com",
-      databaseURL: "https://school-scores-8e9eb-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "school-scores-8e9eb",
-      storageBucket: "school-scores-8e9eb.firebasestorage.app",
-      messagingSenderId: "416720346956",
-      appId: "1:416720346956:web:b20e84af0b635b374279e9",
-      measurementId: "G-DD7E1RFNC1"
-    };
+h1 {
+  color: #014a93;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
 
-    // เริ่มต้น Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+/* Header */
+header {
+  padding: 40px 20px;
+}
 
-    // ✅ ฟังก์ชันโหลดคะแนนรวม
-    function loadScores() {
-      db.ref("scores").on("value", (snapshot) => {
-        const data = snapshot.val() || {};
-        const container = document.getElementById("scoreboard");
-        container.innerHTML = "";
+.school-logo {
+  width: 120px;
+  margin-bottom: 15px;
+  mix-blend-mode: multiply;
+}
 
-        // รายชื่อคณะสี
-        const faculties = ["มาลัยพิรุณ","ไพจิตเวหาส","โอภาสรวี","จันทราอำไพ","รัศมีดารา"];
-        const totals = {};
-        faculties.forEach(f => totals[f] = 0);
+header h1 {
+  font-size: 28px;
+  line-height: 1.4;
+  margin: 0;
+}
 
-        // รวมคะแนนตามคณะ
-        for (let key in data) {
-          const item = data[key];
-          if (totals[item.faculty] !== undefined) {
-            totals[item.faculty] += item.value;
-          }
-        }
+/* Main */
+main {
+  margin-top: 40px;
+}
 
-        // แสดงผลคะแนนรวม
-        faculties.forEach(f => {
-          container.innerHTML += `
-            <div class="score-card">
-              <h3>${f}</h3>
-              <p>${totals[f]} คะแนน</p>
-            </div>
-          `;
-        });
-      });
-    }
+.login-btn {
+  display: inline-block;
+  background-color: #FFD700;
+  color: #003366;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: 0.3s;
+  border: 2px solid #003366;
+}
 
-    // ✅ โหลดคะแนนทันทีเมื่อหน้าเว็บเปิด
-    document.addEventListener("DOMContentLoaded", loadScores);
-  </script>
-</body>
-</html>
+.login-btn:hover {
+  background-color: #003366;
+  color: #FFD700;
+}
+
+.news-banner {
+  background-color: #fff;
+  color: #003366;
+  padding: 10px 20px;
+  margin: 20px auto;
+  border-radius: 8px;
+  max-width: 600px;
+  font-size: 18px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
