@@ -25,17 +25,15 @@
     </table>
   </main>
 
-    <!-- ✅ Firebase SDK แบบ UMD (เวอร์ชัน 8) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-
   <footer>
-    <p>© โรงเรียนสตรีนครสวรรค์ |<a href="report.html"> พิมพ์รายงาน</a></p>
+    <p>© โรงเรียนสตรีนครสวรรค์ | <a href="report.html">พิมพ์รายงาน</a></p>
   </footer>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 <script>
-  // เริ่มต้น Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDwmeumgDSVlspe7gIcF6rVbe-hBye7Q3I",
     authDomain: "school-scores-8e9eb.firebaseapp.com",
@@ -50,67 +48,99 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  function calculateSummary() {
-    // ✅ รายชื่อคณะทั้ง 5 (สะกดตรงกับ teacher.html)
-    const faculties = [
-      "มาลัยพิรุณ",
-      "ไพจิตเวหาส",
-      "โอภาสรวี",
-      "จันทราอำไพ",
-      "รัศมีดารา"
-    ];
+  const FACULTIES = ["มาลัยพิรุณ","ไพจิตเวหาส","โอภาสรวี","จันทราอำไพ","รัศมีดารา"];
 
-    // รวมคะแนนตามคณะ
+  const CLASSROOMS = {
+    "มาลัยพิรุณ": ["1/4","1/9","2/5","2/10","3/1","3/6","3/11","4/1","4/6","4/11","5/2","5/12","6/2","6/7","6/12"],
+    "ไพจิตเวหาส": ["1/5","1/10","2/1","2/6","2/11","3/2","3/7","3/12","4/2","4/12","5/3","5/8","6/3","6/8","6/11"],
+    "โอภาสรวี": ["1/1","1/6","1/11","2/2","2/7","3/3","3/8","4/3","4/8","4/13","5/4","5/9","5/11","6/4","6/9"],
+    "จันทราอำไพ": ["1/3","1/8","1/13","2/4","2/9","3/5","3/10","4/5","4/7","4/10","5/1","5/6","6/5","6/6","6/13"],
+    "รัศมีดารา": ["1/2","1/7","1/12","2/3","2/8","2/13","3/4","3/9","4/4","4/9","5/5","5/7","5/10","5/13","6/1","6/10"]
+  };
+
+  const TYPE_LATE = "คะแนนมาสาย";
+  const TYPE_LINEUP = "คะแนนการเข้าแถว";
+  const TYPE_CLEAN = "คะแนนความสะอาด";
+  const LATE_RANK_SCORES = [9, 8, 7, 6, 5];
+
+  db.ref("scores").on("value", (snapshot) => {
+    const data = snapshot.val() || {};
+
     const totals = {};
-    faculties.forEach(f => totals[f] = 0);
+    const lateCounts = {};
+    const lateHasData = {};     // ✅ เพิ่ม
+    const lineupTotals = {};
+    const cleanTotals = {};
 
-    // ✅ ดึงข้อมูลจาก Firebase
-    db.ref("scores").on("value", (snapshot) => {
-      const data = snapshot.val() || {};
-
-      // เคลียร์คะแนนก่อนรวมใหม่
-      faculties.forEach(f => totals[f] = 0);
-
-      for (let key in data) {
-        const item = data[key];
-        if (totals[item.faculty] !== undefined) {
-          totals[item.faculty] += item.value;
-        }
-      }
-
-      // หาคณะคะแนนสูงสุด
-      let winner = null;
-      let maxScore = -Infinity;
-      faculties.forEach(f => {
-        if (totals[f] > maxScore) {
-          maxScore = totals[f];
-          winner = f;
-        }
-      });
-
-      // แสดงผลผู้ชนะ
-      const winnerBox = document.getElementById("winnerBox");
-      if (winner) {
-        winnerBox.innerHTML = `🏆 <strong>${winner}</strong> ได้เป็นคณะยอดเยี่ยมประจำสัปดาห์ ด้วยคะแนนรวม ${maxScore} คะแนน`;
-      } else {
-        winnerBox.innerHTML = "ยังไม่มีข้อมูลคะแนนในสัปดาห์นี้";
-      }
-
-      // เติมตารางสรุปครบ 5 คณะ
-      const tbody = document.getElementById("summaryTable").querySelector("tbody");
-      tbody.innerHTML = "";
-      faculties.forEach(f => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${f}</td>
-          <td>${totals[f]}</td>
-        `;
-        tbody.appendChild(row);
-      });
+    FACULTIES.forEach(f => {
+      totals[f] = 0;
+      lateCounts[f] = 0;
+      lateHasData[f] = false;  // ✅ เพิ่ม
+      lineupTotals[f] = 0;
+      cleanTotals[f] = 0;
     });
-  }
 
-  calculateSummary();
+    for (const key in data) {
+      const item = data[key] || {};
+      const faculty = (item.faculty || "").trim();
+      if (!FACULTIES.includes(faculty)) continue;
+
+      const val = Number(item.value) || 0;
+
+      if (item.type === TYPE_LATE) {
+        lateCounts[faculty] += val;
+        lateHasData[faculty] = true; // ✅ มีข้อมูลมาสายจริง
+      } else if (item.type === TYPE_LINEUP) {
+        lineupTotals[faculty] += val;
+      } else if (item.type === TYPE_CLEAN) {
+        cleanTotals[faculty] += val;
+      }
+    }
+
+    // รวมคะแนนเข้าแถว + ความสะอาดเฉลี่ยตามจำนวนห้อง
+    FACULTIES.forEach(f => {
+      totals[f] += lineupTotals[f];
+      const roomCount = CLASSROOMS[f]?.length || 0;
+      totals[f] += roomCount > 0 ? (cleanTotals[f] / roomCount) : 0;
+    });
+
+    // ✅ จัดอันดับมาสาย: คณะที่ไม่มีข้อมูล => Infinity (ไปท้ายสุด)
+    const sortedByLate = FACULTIES
+      .map(f => [f, lateHasData[f] ? lateCounts[f] : Number.POSITIVE_INFINITY])
+      .sort((a, b) => a[1] - b[1]);
+
+    // แจกคะแนนมาสายตามอันดับ (น้อยดีกว่า)
+    sortedByLate.forEach(([f], idx) => {
+      const lateScore = LATE_RANK_SCORES[Math.min(idx, LATE_RANK_SCORES.length - 1)];
+      totals[f] += lateScore;
+    });
+
+    // หา winner
+    let winner = null;
+    let maxScore = -Infinity;
+    FACULTIES.forEach(f => {
+      if (totals[f] > maxScore) {
+        maxScore = totals[f];
+        winner = f;
+      }
+    });
+
+    const winnerBox = document.getElementById("winnerBox");
+    if (winner && isFinite(maxScore)) {
+      winnerBox.innerHTML = `🏆 <strong>${winner}</strong> ได้เป็นคณะยอดเยี่ยมประจำสัปดาห์ ด้วยคะแนนรวม ${maxScore.toFixed(2)} คะแนน`;
+    } else {
+      winnerBox.innerHTML = "ยังไม่มีข้อมูลคะแนนในสัปดาห์นี้";
+    }
+
+    // เติมตาราง
+    const tbody = document.querySelector("#summaryTable tbody");
+    tbody.innerHTML = "";
+    FACULTIES.forEach(f => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${f}</td><td>${(totals[f] || 0).toFixed(2)}</td>`;
+      tbody.appendChild(row);
+    });
+  });
 </script>
 </body>
 </html>
